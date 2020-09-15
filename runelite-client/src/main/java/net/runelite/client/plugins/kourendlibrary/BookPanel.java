@@ -35,9 +35,12 @@ import net.runelite.client.ui.FontManager;
 class BookPanel extends JPanel
 {
 	private JLabel location = new JLabel();
+	private boolean isHeld;
+	private boolean isTarget;
 
 	BookPanel(Book b)
 	{
+		isHeld = false;
 		setBorder(new EmptyBorder(3, 3, 3, 3));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 
@@ -77,14 +80,26 @@ class BookPanel extends JPanel
 
 	void setIsTarget(boolean target)
 	{
+		isTarget = target;
 		location.setForeground(target ? Color.GREEN : Color.ORANGE);
+	}
+
+	public boolean getIsTarget()
+	{
+		return isTarget;
 	}
 
 	void setIsHeld(boolean held)
 	{
+		isHeld = held;
 		if (held)
 		{
 			location.setForeground(Color.WHITE);
 		}
+	}
+
+	public boolean getIsHeld()
+	{
+		return isHeld;
 	}
 }

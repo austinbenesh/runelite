@@ -34,6 +34,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Singleton;
@@ -57,6 +60,11 @@ class KourendLibraryPanel extends PluginPanel
 	private final Library library;
 
 	private final HashMap<Book, BookPanel> bookPanels = new HashMap<>();
+
+	private Tower neT = new Tower(TowerDirection.NE);
+	private Tower nwT = new Tower(TowerDirection.NW);
+	private Tower swT = new Tower(TowerDirection.SW);
+	private Tower midT = new Tower(TowerDirection.MID);
 
 	static
 	{
@@ -86,18 +94,28 @@ class KourendLibraryPanel extends PluginPanel
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = 1;
 		c.gridx = 0;
-		c.gridy = 0;
+		c.gridy = 4;
+
 		Stream.of(Book.values())
-			.filter(b -> !b.isDarkManuscript())
-			.filter(b -> !config.hideVarlamoreEnvoy() || b != Book.VARLAMORE_ENVOY)
-			.sorted(Comparator.comparing(Book::getShortName))
-			.forEach(b ->
-			{
-				BookPanel p = new BookPanel(b);
-				bookPanels.put(b, p);
-				books.add(p, c);
-				c.gridy++;
-			});
+				.filter(b -> !b.isDarkManuscript())
+				.filter(b -> !config.hideVarlamoreEnvoy() || b != Book.VARLAMORE_ENVOY)
+				.sorted(Comparator.comparing(Book::getShortName))
+				.forEach(b ->
+				{
+					BookPanel p = new BookPanel(b);
+					bookPanels.put(b, p);
+					books.add(p, c);
+					c.gridy++;
+				});
+
+		c.gridy = 0;
+		books.add(nwT.label, c);
+		c.gridy++;
+		books.add(neT.label, c);
+		c.gridy++;
+		books.add(swT.label, c);
+		c.gridy++;
+		books.add(midT.label, c);
 
 		JButton reset = new JButton("Reset", RESET_ICON);
 		reset.setRolloverIcon(RESET_HOVER_ICON);
@@ -114,6 +132,16 @@ class KourendLibraryPanel extends PluginPanel
 
 	void update()
 	{
+		HashMap<TowerDirection,Tower> towers = new HashMap<TowerDirection,Tower>();
+		neT.reset();
+		nwT.reset();
+		swT.reset();
+		midT.reset();
+		towers.put(TowerDirection.NE,neT);
+		towers.put(TowerDirection.NW,nwT);
+		towers.put(TowerDirection.SW,swT);
+		towers.put(TowerDirection.MID,midT);
+
 		SwingUtilities.invokeLater(() ->
 		{
 			Book customerBook = library.getCustomerBook();
@@ -155,10 +183,55 @@ class KourendLibraryPanel extends PluginPanel
 				}
 				else
 				{
+					for(String loc : locs)
+					{
+						if(!e.getValue().getIsHeld()) {
+
+							//Add book to counter if not currently held
+							TowerDirection tKey = getDirectionFromString(loc);
+							towers.get(tKey).addBook();
+
+							if(e.getValue().getIsTarget())
+							{
+								towers.get(tKey).setTarget(true);
+							}
+						}
+					}
 					e.getValue().setLocation("<html>" + locs.stream().collect(Collectors.joining("<br>")) + "</html>");
 				}
 			}
+			List<Tower> towerVals = new ArrayList<Tower>(towers.values());
+			Collections.sort(towerVals);
+
+			for (int i = 0; i < towerVals.size(); i++) {
+			    //Include towers tied for top 2 as yellow
+                if (towerVals.get(i).compareTo(towerVals.get(2)) >= 0) {
+                    TowerDirection dirKey = towerVals.get(i).getDirection();
+                    towers.get(dirKey).setMost2(true);
+                }
+			}
+
 		});
+	}
+
+	private TowerDirection getDirectionFromString(String direction)
+	{
+		if(direction.startsWith("Northeast"))
+		{
+			return TowerDirection.NE;
+		}
+		else if(direction.startsWith("Northwest"))
+		{
+			return TowerDirection.NW;
+		}
+		if(direction.startsWith("Southwest"))
+		{
+			return TowerDirection.SW;
+		}
+		else
+		{
+			return TowerDirection.MID;
+		}
 	}
 
 	void reload()
