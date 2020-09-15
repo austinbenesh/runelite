@@ -191,8 +191,7 @@ class KourendLibraryPanel extends PluginPanel
 							TowerDirection tKey = getDirectionFromString(loc);
 							towers.get(tKey).addBook();
 
-							if(e.getValue().getIsTarget())
-							{
+							if(e.getValue().getIsTarget()) {
 								towers.get(tKey).setTarget(true);
 							}
 						}

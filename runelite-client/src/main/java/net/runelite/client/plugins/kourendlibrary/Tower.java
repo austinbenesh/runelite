@@ -29,6 +29,7 @@ public class Tower implements Comparable
         isTarget = false;
         numBooks = 0;
         label.setText(getLabelDirectionFromEnum(direction) + numBooks);
+        refreshLabel();
     }
 
     private String getLabelDirectionFromEnum(TowerDirection dir)
@@ -81,7 +82,7 @@ public class Tower implements Comparable
         {
             label.setForeground(Color.green);
         }
-        else if (isMost2)
+        else if(isMost2)
         {
             label.setForeground(Color.yellow);
         }
@@ -111,6 +112,10 @@ public class Tower implements Comparable
             else if(this.isTarget)
             {
                 return 1;
+            }
+            else if(comp.isTarget)
+            {
+                return -1;
             }
             else if(comp.numBooks > this.numBooks)
             {
