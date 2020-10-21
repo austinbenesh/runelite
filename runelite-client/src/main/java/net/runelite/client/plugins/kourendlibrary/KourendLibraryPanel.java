@@ -95,16 +95,16 @@ class KourendLibraryPanel extends PluginPanel
 		c.gridy = 4;
 
 		Stream.of(Book.values())
-				.filter(b -> !b.isDarkManuscript())
-				.filter(b -> b != Book.VARLAMORE_ENVOY || plugin.showVarlamoreEnvoy())
-				.sorted(Comparator.comparing(Book::getShortName))
-				.forEach(b ->
-				{
-					BookPanel p = new BookPanel(b);
-					bookPanels.put(b, p);
-					books.add(p, c);
-					c.gridy++;
-				});
+			.filter(b -> !b.isDarkManuscript())
+			.filter(b -> b != Book.VARLAMORE_ENVOY || plugin.showVarlamoreEnvoy())
+			.sorted(Comparator.comparing(Book::getShortName))
+			.forEach(b ->
+			{
+				BookPanel p = new BookPanel(b);
+				bookPanels.put(b, p);
+				books.add(p, c);
+				c.gridy++;
+			});
 		c.gridy = 0;
 		books.add(nwT.label, c);
 		c.gridy++;
